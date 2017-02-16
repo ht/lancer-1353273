@@ -42,7 +42,7 @@ class DSContentsServiceProvider implements ServiceProviderInterface
         $app->match(
             '/'.$app['config']['admin_route'].'/DSContents/setting',
             'Plugin\DSContents\Controller\AdminDSContentsController::index'
-        )->bind('DSContents_info');
+        )->bind('dscontents_info');
 
         $app->match(sprintf('/%s/dsc/sp/page', $app['config']['admin_route']), '\Plugin\DSContents\Controller\Admin\Content\PageController::index')->bind('plugin_dscontents_admin_content_page');
         $app->match(sprintf('/%s/dsc/sp/page/{id}/edit', $app['config']['admin_route']), '\Plugin\DSContents\Controller\Admin\Content\PageController::edit')->assert('id', '\d+')->bind('plugin_dscontents_admin_content_page_edit');
@@ -75,11 +75,11 @@ class DSContentsServiceProvider implements ServiceProviderInterface
         /**
          * レポジトリ登録
          */
-        $app['eccube.plugin.DSContents.repository.DSContents'] = $app->share(
-            function () use ($app) {
-                return $app['orm.em']->getRepository('Plugin\DSContents\Entity\DSContents');
-            }
-        );
+        // $app['eccube.plugin.DSContents.repository.DSContents'] = $app->share(
+        //     function () use ($app) {
+        //         return $app['orm.em']->getRepository('Plugin\DSContents\Entity\DSContents');
+        //     }
+        // );
 
 
 
@@ -94,6 +94,7 @@ class DSContentsServiceProvider implements ServiceProviderInterface
         $app['form.types'] = $app->share($app->extend('form.types', function ($types) use ($app) {
             $types[] = new \Plugin\DSContents\Form\Type\Admin\Content\MainEditType();
             $types[] = new \Plugin\DSContents\Form\Type\Admin\Content\BlockType();
+			$types[] = new \Plugin\DSContents\Form\Type\DSContentsInfoType($app);
             return $types;
         })
         );
@@ -111,7 +112,7 @@ class DSContentsServiceProvider implements ServiceProviderInterface
                 function ($config) {
                     $addNavi['id'] = "DSContents_info";
                     $addNavi['name'] = "DSContents設定";
-                    $addNavi['url'] = "DSContents_info";
+                    $addNavi['url'] = "dscontents_info";
                     $nav = $config['nav'];
                     foreach ($nav as $key => $val) {
                         if ("setting" == $val["id"]) {
