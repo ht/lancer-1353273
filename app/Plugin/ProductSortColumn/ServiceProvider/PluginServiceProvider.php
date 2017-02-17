@@ -16,7 +16,6 @@ use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
 use Plugin\ProductSortColumn\Event\Event;
-use Plugin\ProductSortColumn\Event\LegacyEvent;
 use Silex\Application as BaseApplication;
 use Silex\ServiceProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,7 +27,6 @@ class PluginServiceProvider implements ServiceProviderInterface
     public function register(BaseApplication $app)
     {
         $app->mount('', new \Plugin\ProductSortColumn\ControllerProvider\FrontControllerProvider());
-        $app->mount(sprintf('/%s/', trim($app['config']['admin_route'])) , new \Plugin\ProductSortColumn\ControllerProvider\AdminControllerProvider());
 
         $app['eccube.plugin.product_sort_column.repository.info'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Plugin\ProductSortColumn\Entity\Info');
@@ -52,20 +50,9 @@ class PluginServiceProvider implements ServiceProviderInterface
             return $extensions;
         }));
 
-        $app['eccube.plugin.product_sort_column.service.product_sort_column'] = $app->share(function () use ($app) {
-            return new \Plugin\ProductSortColumn\Service\PluginService($app);
-        });
-
         $app['eccube.plugin.product_sort_column.event.event'] = $app->share(function () use ($app) {
             return new Event($app);
         });
-
-        $app['eccube.plugin.product_sort_column.event.legacy_event'] = $app->share(function () use ($app) {
-            return new LegacyEvent($app);
-        });
-
-        $file = sprintf('%s/../Resource/locale/message.%s.yml', __DIR__, $app['locale']);
-        $app['translator']->addResource('yaml', $file, $app['locale']);
 
         if (isset($app['config']['ProductSortColumn']['const'])) {
             $const = $app['config']['ProductSortColumn']['const'];
@@ -113,10 +100,6 @@ class PluginServiceProvider implements ServiceProviderInterface
 
             return $logger;
         });
-
-        if (isset($app['console'])) {
-            $app['console']->add(new \Plugin\ProductSortColumn\Command\PluginCommand());
-        }
     }
 
     public function boot(BaseApplication $app)
