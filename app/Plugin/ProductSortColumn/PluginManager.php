@@ -130,7 +130,7 @@ class PluginManager extends AbstractPluginManager
         $Block = $app['eccube.repository.block']->findOrCreate(null, $DeviceType);
         $Block
             ->setName('ソート商品一覧')
-            ->setFileName('plugin_product_sort_column_list')
+            ->setFileName('plugin_product_sort_column_product_list')
             ->setDeletableFlg(0)
             ->setLogicFlg(1);
 
