@@ -12,11 +12,11 @@ namespace Plugin\ProductSortColumn;
 
 use Eccube\Application;
 use Eccube\Event\EventArgs;
-use Plugin\ProductSortColumn\Util\Version;
+use Eccube\Event\TemplateEvent;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
 class PluginEvent
 {
-
     /** @var \Eccube\Application $app */
     protected $app;
 
@@ -28,18 +28,24 @@ class PluginEvent
     /**
      * @param EventArgs $event
      */
-    public function onEvent($event)
+    public function onAdminProductEditComplete($event)
     {
-        $this->app['eccube.plugin.product_sort_column.event.event']->onEvent($event);
+        $this->app['eccube.plugin.product_sort_column.event.event']->onAdminProductEditComplete($event);
     }
 
     /**
-     * @param EventArgs $event
+     * @param TemplateEvent $event
      */
-    public function onEventLegacy($event)
+    public function onAdminProductEditRender($event)
     {
-        if (Version::isSupportNewHookPoint()) {
-            $this->app['eccube.plugin.product_sort_column.event.legacy_event']->onEvent($event);
-        }
+        $this->app['eccube.plugin.product_sort_column.event.event']->onAdminProductEditRender($event);
+    }
+
+    /**
+     * @param FilterResponseEvent $event
+     */
+    public function onAdminProductEditRenderBefore($event)
+    {
+        $this->app['eccube.plugin.product_sort_column.event.event']->onAdminProductEditRenderBefore($event);
     }
 }

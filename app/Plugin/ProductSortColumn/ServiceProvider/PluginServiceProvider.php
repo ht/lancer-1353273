@@ -29,17 +29,17 @@ class PluginServiceProvider implements ServiceProviderInterface
         $app->mount('', new \Plugin\ProductSortColumn\ControllerProvider\FrontControllerProvider());
         $app->mount(sprintf('/%s/', trim($app['config']['admin_route'])) , new \Plugin\ProductSortColumn\ControllerProvider\AdminControllerProvider());
 
-        $app['eccube.plugin.product_sort_column.repository.product_sort_column_info'] = $app->share(function () use ($app) {
-            return $app['orm.em']->getRepository('Plugin\ProductSortColumn\Entity\Info');
+        $app['eccube.plugin.product_sort_column.repository.product_sort'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Plugin\ProductSortColumn\Entity\ProductSort');
         });
 
         $app['form.types'] = $app->share($app->extend('form.types', function ($types) use ($app) {
-            $types[] = new \Plugin\ProductSortColumn\Form\Type\Admin\ConfigType($app);
+            $types[] = new \Plugin\ProductSortColumn\Form\Type\Admin\ProductSortType($app);
             return $types;
         }));
 
-        $app['form.type.extensions'] = $app->share($app->extend('form.type.extensions', function ($extensions) {
-            $extensions[] = new \Plugin\ProductSortColumn\Form\Extension\ConfigTypeExtension();
+        $app['form.type.extensions'] = $app->share($app->extend('form.type.extensions', function ($extensions) use ($app) {
+            $extensions[] = new \Plugin\ProductSortColumn\Form\Extension\Admin\ProductTypeExtension($app);
             return $extensions;
         }));
 

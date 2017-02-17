@@ -16,7 +16,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class ConfigType extends AbstractType
+class ProductSortType extends AbstractType
 {
     protected $app;
 
@@ -32,7 +32,9 @@ class ConfigType extends AbstractType
     {
         $app = $this->app;
         $builder
-            ->add('name', 'text', array(
+            ->add('sort01', 'text', array(
+                'label' => 'ソート項目',
+                'required' => false,
                 'constraints' => array(
                     new Assert\Length(array('max' => $app['config']['stext_len'])),
                 ),
@@ -45,7 +47,7 @@ class ConfigType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Plugin\ProductSortColumn\Entity\Info',
+            'data_class' => 'Plugin\ProductSortColumn\Entity\ProductSort',
         ));
     }
 
@@ -54,6 +56,6 @@ class ConfigType extends AbstractType
      */
     public function getName()
     {
-        return 'plg_product_sort_column_admin_config';
+        return 'plg_product_sort_column_admin_product_sort';
     }
 }

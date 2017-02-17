@@ -25,7 +25,7 @@ class ConfigController extends AbstractController
      */
     public function index(Application $app, Request $request)
     {
-        $Info = $app['eccube.plugin.product_sort_column.repository.product_sort_column_info']->get();
+        $Info = $app['eccube.plugin.product_sort_column.repository.product']->get();
         $builder = $app['form.factory']->createBuilder('plg_product_sort_column_admin_config', $Info);
 
         $event = new EventArgs(compact('builder', 'Info'), $request);

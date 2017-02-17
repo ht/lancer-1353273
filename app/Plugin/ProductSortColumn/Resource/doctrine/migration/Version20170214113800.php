@@ -13,17 +13,18 @@ namespace DoctrineMigrations;
 use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
 
-class Version201701211332 extends AbstractMigration
+class Version20170214113800 extends AbstractMigration
 {
     /**
      * @param Schema $schema
      */
     public function up(Schema $schema)
     {
-        $table = $schema->createTable('plg_product_sort_column_info');
-        $table->addColumn('id', 'integer', array('autoincrement' => true));
-        $table->addColumn('name', 'text', array('notnull' => false));
-        $table->setPrimaryKey(array('id'));
+        $table = $schema->createTable('plg_product_sort_column_product_sort');
+        $table->addColumn('product_id', 'integer');
+        $table->addColumn('sort01', 'text', array('notnull' => false));
+        $table->setPrimaryKey(array('product_id'));
+        $table->addForeignKeyConstraint('dtb_product', array('product_id'), array('product_id'));
     }
 
     /**
@@ -31,6 +32,6 @@ class Version201701211332 extends AbstractMigration
      */
     public function down(Schema $schema)
     {
-        $schema->dropTable('plg_product_sort_column_info');
+        $schema->dropTable('plg_product_sort_column_product_sort');
     }
 }

@@ -1,1 +1,8 @@
-event.name: {}
+admin.product.edit.complete:
+    - [onAdminProductEditComplete, NORMAL]
+eccube.event.render.admin_product_product_new.before:
+    - [onAdminProductEditRenderBefore, NORMAL]
+eccube.event.render.admin_product_product_edit.before:
+    - [onAdminProductEditRenderBefore, NORMAL]
+Admin/Product/product.twig:
+    - [onAdminProductEditRender, NORMAL]
