@@ -29,6 +29,10 @@ class PluginServiceProvider implements ServiceProviderInterface
         $app->mount('', new \Plugin\ProductSortColumn\ControllerProvider\FrontControllerProvider());
         $app->mount(sprintf('/%s/', trim($app['config']['admin_route'])) , new \Plugin\ProductSortColumn\ControllerProvider\AdminControllerProvider());
 
+        $app['eccube.plugin.product_sort_column.repository.info'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Plugin\ProductSortColumn\Entity\Info');
+        });
+
         $app['eccube.plugin.product_sort_column.repository.product_sort'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Plugin\ProductSortColumn\Entity\ProductSort');
         });

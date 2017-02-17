@@ -24,7 +24,7 @@ class AdminControllerProvider implements ControllerProviderInterface
             $c->requireHttps();
         }
 
-        $c->match('/plugin/ProductSortColumn/config', 'Plugin\ProductSortColumn\Controller\Admin\ConfigController::index')->bind('plugin_ProductSortColumn_config');
+        $c->match('/plugin/ProductSortColumn/config', 'Plugin\ProductSortColumn\Controller\Admin\ConfigController::index')->bind('plugin_product_sort_column_config');
 
         return $c;
     }

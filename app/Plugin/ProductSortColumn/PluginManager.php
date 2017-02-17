@@ -10,7 +10,9 @@
 
 namespace Plugin\ProductSortColumn;
 
+use Doctrine\ORM\QueryBuilder;
 use Eccube\Application;
+use Eccube\Entity\Master\ProductListOrderBy;
 use Eccube\Plugin\AbstractPluginManager;
 
 class PluginManager extends AbstractPluginManager
@@ -39,6 +41,7 @@ class PluginManager extends AbstractPluginManager
      */
     public function enable($config, Application $app)
     {
+        $this->createOrderBy($config, $app);
     }
 
     /**
@@ -47,6 +50,7 @@ class PluginManager extends AbstractPluginManager
      */
     public function disable($config, Application $app)
     {
+        $this->deleteOrderBy($config, $app);
     }
 
     /**
@@ -56,5 +60,57 @@ class PluginManager extends AbstractPluginManager
     public function update($config, Application $app)
     {
         $this->migrationSchema($app, __DIR__ . '/Resource/doctrine/migration', $config['code']);
+    }
+
+    /**
+     * @param $config
+     * @param Application $app
+     */
+    protected function createOrderBy($config, Application $app)
+    {
+        $getNext = function ($col) use ($app) {
+            /** @var QueryBuilder $qb */
+            $qb = $app['orm.em']->createQueryBuilder();
+            return $qb
+                    ->select(sprintf('MAX(ob.%s)', $col))
+                    ->from('Eccube\Entity\Master\ProductListOrderBy', 'ob')
+                    ->getQuery()
+                    ->getSingleScalarResult() + 1;
+        };
+
+        $Sort01 = new ProductListOrderBy();
+        $Sort01
+            ->setId($getNext('id'))
+            ->setName('ソート項目順')
+            ->setRank($getNext('rank'));
+        $app['orm.em']->persist($Sort01);
+        $app['orm.em']->flush();
+
+        $values = array(
+            'sort01_id' => $Sort01->getId(),
+        );
+
+        $app['orm.em']->getConnection()->executeUpdate('UPDATE plg_product_sort_column_info SET sort01_id = :sort01_id WHERE id = 1;', $values);
+    }
+
+    /**
+     * @param $config
+     * @param Application $app
+     */
+    protected function deleteOrderBy($config, Application $app)
+    {
+        $conn = $app['orm.em']->getConnection();
+        $sql = 'SELECT sort01_id FROM plg_product_sort_column_info WHERE id = 1;';
+        $rows = $conn->fetchAll($sql);
+
+        $conn->executeUpdate('UPDATE plg_product_sort_column_info SET sort01_id = NULL WHERE id = 1;');
+
+        if (is_array($rows)) {
+            foreach ($rows as $cols) {
+                foreach ($cols as $col) {
+                    $conn->executeUpdate('DELETE FROM mtb_product_list_order_by WHERE id = :id', array('id' => $col));
+                }
+            }
+        }
     }
 }
