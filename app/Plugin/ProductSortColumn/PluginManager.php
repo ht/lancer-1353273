@@ -12,6 +12,8 @@ namespace Plugin\ProductSortColumn;
 
 use Doctrine\ORM\QueryBuilder;
 use Eccube\Application;
+use Eccube\Entity\Block;
+use Eccube\Entity\Master\DeviceType;
 use Eccube\Entity\Master\ProductListOrderBy;
 use Eccube\Plugin\AbstractPluginManager;
 
@@ -42,6 +44,7 @@ class PluginManager extends AbstractPluginManager
     public function enable($config, Application $app)
     {
         $this->createOrderBy($config, $app);
+        $this->createBlock($config, $app);
     }
 
     /**
@@ -51,6 +54,7 @@ class PluginManager extends AbstractPluginManager
     public function disable($config, Application $app)
     {
         $this->deleteOrderBy($config, $app);
+        $this->deleteBlock($config, $app);
     }
 
     /**
@@ -112,5 +116,42 @@ class PluginManager extends AbstractPluginManager
                 }
             }
         }
+    }
+
+    /**
+     * @param $config
+     * @param Application $app
+     */
+    protected function createBlock($config, Application $app)
+    {
+        $DeviceType = $app['eccube.repository.master.device_type']->find(DeviceType::DEVICE_TYPE_PC);
+
+        /** @var Block $Block */
+        $Block = $app['eccube.repository.block']->findOrCreate(null, $DeviceType);
+        $Block
+            ->setName('ソート商品一覧')
+            ->setFileName('plugin_product_sort_column_list')
+            ->setDeletableFlg(0)
+            ->setLogicFlg(1);
+
+        $app['orm.em']->persist($Block);
+        $app['orm.em']->flush();
+    }
+
+    /**
+     * @param $config
+     * @param Application $app
+     */
+    protected function deleteBlock($config, Application $app)
+    {
+        /** @var QueryBuilder $qb */
+        $qb = $app['eccube.repository.block']->createQueryBuilder('b');
+        $fileNameLike = 'plugin_product_sort_column_%';
+        $qb
+            ->delete()
+            ->where($qb->expr()->like('b.file_name', ':fileName'))
+            ->setParameter('fileName', $fileNameLike)
+            ->getQuery()
+            ->execute();
     }
 }

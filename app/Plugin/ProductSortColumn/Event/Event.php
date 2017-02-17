@@ -11,9 +11,11 @@
 namespace Plugin\ProductSortColumn\Event;
 
 use Doctrine\ORM\QueryBuilder;
+use Eccube\Entity\Block;
 use Eccube\Event\EventArgs;
 use Eccube\Event\TemplateEvent;
 use Plugin\ProductSortColumn\Entity\Info;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
@@ -105,5 +107,35 @@ class Event extends CommonEvent
         if ($join) {
             $qb->leftJoin('Plugin\ProductSortColumn\Entity\ProductSort', 'ps', \Doctrine\ORM\Query\Expr\Join::WITH, 'p.id = ps.Product');
         }
+    }
+
+    /**
+     * @param EventArgs $event
+     */
+    public function onAdminContentBlockEditInitialize($event)
+    {
+        $app = $this->app;
+
+        /** @var Block $Block */
+        $Block = $event->getArgument('Block');
+        $fileName = $Block->getFileName();
+        $html = '';
+
+        $readPaths = array(
+            $app['config']['block_realdir'],
+            $app['config']['block_default_realdir'],
+            sprintf('%s/ProductSortColumn/Resource/template/%s/Block', $app['config']['plugin_realdir'], $app['config']['template_code']),
+        );
+
+        foreach ($readPaths as $readPath) {
+            $filePath = $readPath . '/' . $fileName . '.twig';
+            $fs = new Filesystem();
+            if ($fs->exists($filePath)) {
+                $html = file_get_contents($filePath);
+                break;
+            }
+        }
+
+        $event->setArgument('html', $html);
     }
 }

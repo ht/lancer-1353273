@@ -24,6 +24,8 @@ class FrontControllerProvider implements ControllerProviderInterface
             $c->requireHttps();
         }
 
+        $c->match('/block/plugin_product_sort_column_list', '\Plugin\ProductSortColumn\Controller\Block\ProductController::index')->bind('block_plugin_product_sort_column_product_list');
+
         return $c;
     }
 }

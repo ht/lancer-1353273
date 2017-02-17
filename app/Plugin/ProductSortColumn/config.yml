@@ -6,4 +6,5 @@ service:
     - PluginServiceProvider
 orm.path:
     - /Resource/doctrine
-const: {}
+const:
+    product_sort_list_limit: 5

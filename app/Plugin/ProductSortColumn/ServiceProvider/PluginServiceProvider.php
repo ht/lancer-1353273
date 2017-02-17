@@ -19,6 +19,7 @@ use Plugin\ProductSortColumn\Event\Event;
 use Plugin\ProductSortColumn\Event\LegacyEvent;
 use Silex\Application as BaseApplication;
 use Silex\ServiceProviderInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 require_once(__DIR__ . '/../log.php');
 
@@ -35,6 +36,10 @@ class PluginServiceProvider implements ServiceProviderInterface
 
         $app['eccube.plugin.product_sort_column.repository.product_sort'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Plugin\ProductSortColumn\Entity\ProductSort');
+        });
+
+        $app['eccube.plugin.product_sort_column.repository.master.product_list_order_by'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\Master\ProductListOrderBy');
         });
 
         $app['form.types'] = $app->share($app->extend('form.types', function ($types) use ($app) {
@@ -68,6 +73,23 @@ class PluginServiceProvider implements ServiceProviderInterface
                 return $const;
             });
         }
+
+        $app->before(function (Request $request, Application $app) {
+            $app['twig'] = $app->share($app->extend('twig', function (\Twig_Environment $twig, Application $app) {
+
+                $paths = array();
+
+                if ($app->isAdminRequest()) {
+                    $paths[] = __DIR__ . '/../Resource/template/admin/';
+                } else {
+                    $paths[] = __DIR__ . sprintf('/../Resource/template/%s/', $app['config']['template_code']);
+                }
+
+                $app['twig.loader']->addLoader(new \Twig_Loader_Filesystem($paths));
+
+                return $twig;
+            }));
+        }, $app::LATE_EVENT);
 
         $app['monolog.logger.product_sort_column'] = $app->share(function ($app) {
 
