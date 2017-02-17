@@ -10,8 +10,10 @@
 
 namespace Plugin\ProductSortColumn\Event;
 
+use Doctrine\ORM\QueryBuilder;
 use Eccube\Event\EventArgs;
 use Eccube\Event\TemplateEvent;
+use Plugin\ProductSortColumn\Entity\Info;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
@@ -75,5 +77,33 @@ class Event extends CommonEvent
 
         $response->setContent(mb_convert_encoding($dom->saveHTML(), 'UTF-8', 'HTML-ENTITIES'));
         $event->setResponse($response);
+    }
+
+    /**
+     * @param EventArgs $event
+     */
+    public function onProductSearch($event)
+    {
+        $app = $this->app;
+        /** @var Info $Info */
+        $Info = $app['eccube.plugin.product_sort_column.repository.info']->get();
+
+        /** @var QueryBuilder $qb */
+        $qb = $event->getArgument('qb');
+        $searchData = $event->getArgument('searchData');
+        $join = false;
+
+        if (!empty($searchData['orderby'])) {
+            if ($Info->getSort01() && $searchData['orderby']->getId() == $Info->getSort01()->getId()) {
+                $join = true;
+                $qb
+                    ->orderBy('ps.sort01', 'ASC')
+                    ->addOrderBy('p.id', 'DESC');
+            }
+        }
+
+        if ($join) {
+            $qb->leftJoin('Plugin\ProductSortColumn\Entity\ProductSort', 'ps', \Doctrine\ORM\Query\Expr\Join::WITH, 'p.id = ps.Product');
+        }
     }
 }

@@ -48,4 +48,12 @@ class PluginEvent
     {
         $this->app['eccube.plugin.product_sort_column.event.event']->onAdminProductEditRenderBefore($event);
     }
+
+    /**
+     * @param EventArgs $event
+     */
+    public function onProductSearch($event)
+    {
+        $this->app['eccube.plugin.product_sort_column.event.event']->onProductSearch($event);
+    }
 }

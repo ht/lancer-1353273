@@ -6,3 +6,5 @@ eccube.event.render.admin_product_product_edit.before:
     - [onAdminProductEditRenderBefore, NORMAL]
 Admin/Product/product.twig:
     - [onAdminProductEditRender, NORMAL]
+front.product.index.search:
+    - [onProductSearch, NORMAL]
