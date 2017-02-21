@@ -69,7 +69,7 @@ class PluginServiceProvider implements ServiceProviderInterface
                 if ($app->isAdminRequest()) {
                     $paths[] = __DIR__ . '/../Resource/template/admin/';
                 } else {
-                    $paths[] = __DIR__ . sprintf('/../Resource/template/%s/', $app['config']['template_code']);
+                    $paths[] = __DIR__ . '/../Resource/template/default/';
                 }
 
                 $app['twig.loader']->addLoader(new \Twig_Loader_Filesystem($paths));
