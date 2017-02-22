@@ -39,7 +39,7 @@ class ProductTypeExtension extends AbstractTypeExtension
         $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) use ($app) {
             $form = $event->getForm();
             $Product = $form->getData();
-            if (strlen($Product->getId())) {
+            if ($Product && strlen($Product->getId())) {
                 $ProductSort = $app['eccube.plugin.product_sort_column.repository.product_sort']->find($Product);
                 $form['ProductSort']->setData($ProductSort);
             }
